@@ -1,0 +1,150 @@
+/**
+ * VedaAI — Figma design tokens (Inspect panel)
+ */
+
+:root {
+  /* ── Desktop frame ── */
+  --frame-desktop-width: 1440px;
+  --shell-padding: 12px;
+  --shell-gap: 12px;
+
+  /* ── Figma border radii (Filled State layers) ── */
+  --radius-s: 20px;   /* Border radius - S — sidebar, main panel, Default */
+  --radius-xs: 16px;  /* Border radius - XS — cards, Classes Dropdown */
+
+  /* ── Sidebar: 304 × 756 (empty), 304 × 744 (create) ── */
+  --sidebar-width: 304px;
+  --sidebar-height: 756px;
+  --sidebar-height-create: 744px;
+  --sidebar-radius: var(--radius-s);
+  --sidebar-radius-create: 16px;
+  --sidebar-padding: 24px;
+  --sidebar-padding-x: 20px;
+  --sidebar-padding-y: 24px;
+
+  /* ── Main panel: 1100 wide ── */
+  --main-panel-width: 1100px;
+  --main-panel-height: 756px;
+  --main-radius: var(--radius-s);
+
+  /* ── Header: 1100 × 56 ── */
+  --header-height: 56px;
+  --header-width: 1100px;
+  --header-padding-x: 24px;
+
+  /* ── Content body ── */
+  --content-width: 1100px;
+  --content-height: 678px;
+  --content-height-filled: 766px;
+  --main-panel-height-filled: 822px;
+  --sidebar-height-filled: 820px;
+
+  /* ── Screen 3: Create Assignment frame (shell offset top/left 12px) ── */
+  --main-panel-height-create: 744px;
+  --content-height-create: 688px; /* 744 − 56 header */
+  --main-panel-radius-create: 16px;
+
+  /* ── Assignment card (Figma: 542×162, padding 16, gap 16) ── */
+  --assignment-card-width: 542px;
+  --assignment-card-height: 162px;
+  --assignment-card-padding: 16px;
+  --assignment-card-row-gap: 16px;
+  --assignment-card-col-gap: 16px;
+  --assignments-grid-padding-x: 24px;
+  --assignment-card-radius: var(--radius-xs);
+  --assignment-card-border: 1px solid var(--color-bg-off-white);
+  --assignment-card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --assignment-card-menu-width: 140px;
+  --assignment-card-menu-item-height: 42px;
+  /* Mobile (Figma): menu 124×32 per item, card 344×100 */
+  --assignment-card-height-mobile: 100px;
+  --assignment-card-padding-mobile: 16px 8px;
+  --assignment-card-menu-width-mobile: 124px;
+  --assignment-card-menu-item-height-mobile: 32px;
+
+  /* ── Logo & buttons ── */
+  --logo-size: 34px;
+  --logo-text-size: 18px;
+  --btn-create-height: 44px;
+  --btn-create-padding-x: 20px;
+  --btn-create-font-size: 14px;
+  --btn-create-glow: 0 0 0 1.5px rgba(255, 86, 35, 0.45), 0 0 12px rgba(255, 86, 35, 0.2);
+  --gradient-logo: linear-gradient(135deg, #ff7950 0%, #c0350a 100%);
+  --gradient-accent: linear-gradient(135deg, #e56820 0%, #d45e3e 100%);
+
+  /* ── Nav ── */
+  --nav-item-height: 40px;
+  --nav-item-padding-x: 14px;
+  --nav-item-gap: 12px;
+  --nav-item-font-size: 14px;
+  --nav-item-radius: 10px;
+
+  /* ── Org profile ── */
+  --org-avatar-size: 36px;
+  --org-name-size: 13px;
+  --org-location-size: 11px;
+
+  /* ── Empty state ── */
+  --empty-illustration-width: 220px;
+  --empty-illustration-height: 180px;
+  --empty-title-size: 20px;
+  --empty-desc-size: 14px;
+  --empty-desc-line-height: 22px;
+  --empty-desc-max-width: 440px;
+  --empty-cta-height: 44px;
+  --empty-cta-padding-x: 24px;
+
+  /* ── Mobile frame: 393px ── */
+  --frame-mobile-width: 393px;
+  --mobile-header-total-height: 105px;
+  --mobile-header-height: 56px;
+  --mobile-page-bar-height: 81px;
+  --mobile-bottom-zone-height: 157px;
+  --mobile-bottom-nav-width: 373px;
+  --mobile-bottom-nav-height: 65px;
+  --mobile-bottom-nav-radius: 32px;
+  --mobile-bottom-nav-bottom: 24px;
+  --mobile-fab-size: 48px;
+  --mobile-fab-bottom: 100px;
+  --mobile-fab-right: 20px;
+
+  /* ── Shadows ── */
+  --sidebar-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+  --main-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+
+  /* ── Figma color tokens ── */
+  --color-text-primary: #303030;
+  --color-text-secondary-figma: rgba(94, 94, 94, 0.8);
+  --color-text-secondary-muted: rgba(94, 94, 94, 0.55);
+  --color-bg-disabled: #a9a9a9;
+  --color-surface: #ffffff;
+  --color-bg-dark: #5e5e5e;
+  --color-bg-off-white: #f0f0f0;
+  --color-bg-off-white-primary: #f6f6f6;
+  --color-orange-primary: #ff5623;
+  --color-error: #c53535;
+  --color-status-green: #4bc26d;
+  --color-status-green-ring: rgba(75, 194, 109, 0.4);
+  --color-black: #272727;
+  --color-black-hover: #1a1a1a;
+
+  /* ── Semantic aliases ── */
+  --color-page-bg: var(--color-bg-off-white-primary);
+  --color-main-bg-filled: var(--color-bg-off-white-primary);
+  --color-main-bg: var(--color-bg-off-white-primary);
+  --color-orange: var(--color-orange-primary);
+  --color-border: var(--color-bg-off-white);
+  --color-border-light: var(--color-bg-off-white);
+  --color-text: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary-figma);
+  --color-text-muted: var(--color-text-secondary-muted);
+  --color-nav-active: var(--color-bg-off-white);
+  --color-notification: var(--color-orange-primary);
+
+  /* Scroll fade (Figma linear gradient) */
+  --gradient-grid-fade: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    var(--color-bg-off-white-primary) 85%
+  );
+}
