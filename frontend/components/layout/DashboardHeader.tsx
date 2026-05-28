@@ -14,7 +14,9 @@ export function DashboardHeader({
   showBack = true,
 }: DashboardHeaderProps) {
   const pathname = usePathname()
-  const backHref = pathname.includes('/create') ? '/assignments' : '/assignments'
+  const isAssignmentDetail =
+    pathname.match(/^\/assignments\/[^/]+$/) && !pathname.startsWith('/assignments/create')
+  const backHref = pathname.includes('/create') || isAssignmentDetail ? '/' : '/assignments'
 
   return (
     <header className="dashboard-header">

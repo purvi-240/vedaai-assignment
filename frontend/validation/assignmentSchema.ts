@@ -71,12 +71,24 @@ export const assignmentSchema = z.object({
 })
 
 export function validateAssignmentForm(formData: AssignmentFormData) {
-  return assignmentSchema.safeParse(formData)
+  const activeRows = formData.questionRows.filter((row) => row.count > 0)
+  return assignmentSchema.safeParse({
+    ...formData,
+    questionRows: activeRows,
+  })
+}
+
+/** Convert DD-MM-YYYY to ISO date for API/backend */
+export function dueDateToApiFormat(ddMmYyyy: string): string {
+  const match = ddMmYyyy.match(/^(\d{2})-(\d{2})-(\d{4})$/)
+  if (!match) return ddMmYyyy
+  const [, dd, mm, yyyy] = match
+  return `${yyyy}-${mm}-${dd}`
 }
 
 export function formDataToApiPayload(formData: AssignmentFormData) {
   return {
-    dueDate: formData.dueDate,
+    dueDate: dueDateToApiFormat(formData.dueDate),
     questionTypes: rowsToQuestionTypes(formData.questionRows),
     additionalInstructions: formData.additionalInstructions,
     hasFile: formData.file !== null,

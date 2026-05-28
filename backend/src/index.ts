@@ -5,12 +5,14 @@ import { connectDatabase } from './config/database.js'
 import { env } from './config/env.js'
 import { initRedis } from './config/redis.js'
 import { initAssignmentQueue } from './queues/assignmentQueue.js'
+import { startGenerateQuestionsWorker } from './queues/generateQuestionsWorkerRunner.js'
 import { setupWebSocket } from './websocket/server.js'
 
 async function bootstrap(): Promise<void> {
   await connectDatabase()
   await initRedis()
   initAssignmentQueue()
+  startGenerateQuestionsWorker()
 
   const app = createApp()
   const server = createServer(app)

@@ -13,8 +13,14 @@ interface AssignmentState {
   isSubmitting: boolean
   wsStatus: WebSocketStatus
   lastMessage: WebSocketMessage | null
+  referenceContent: string | null
+  referenceExtracting: boolean
+  referenceExtractError: string | null
 
   setFile: (file: File | null) => void
+  setReferenceContent: (content: string | null) => void
+  setReferenceExtracting: (extracting: boolean) => void
+  setReferenceExtractError: (error: string | null) => void
   setDueDate: (dueDate: string) => void
   addQuestionRow: () => void
   removeQuestionRow: (id: string) => void
@@ -51,6 +57,15 @@ export const CREATE_ASSIGNMENT_QUESTION_TYPES = [
   'numerical',
 ] as const satisfies readonly QuestionType[]
 
+/** Pristine create form: all four types visible, counts and marks at zero. */
+export const EMPTY_CREATE_QUESTION_ROWS: QuestionTypeRow[] = [
+  { id: 'row-mcq', type: 'mcq', count: 0, marks: 0 },
+  { id: 'row-short', type: 'short_answer', count: 0, marks: 0 },
+  { id: 'row-diagram', type: 'diagram', count: 0, marks: 0 },
+  { id: 'row-numerical', type: 'numerical', count: 0, marks: 0 },
+]
+
+/** @deprecated Legacy defaults kept for HMR migration only. */
 export const DEFAULT_CREATE_QUESTION_ROWS: QuestionTypeRow[] = [
   { id: 'row-mcq', type: 'mcq', count: 4, marks: 1 },
   { id: 'row-short', type: 'short_answer', count: 3, marks: 2 },
@@ -63,7 +78,7 @@ export function ensureCreateQuestionRows(rows: QuestionTypeRow[]): QuestionTypeR
   const byType = new Map(rows.map((row) => [row.type, row]))
   return CREATE_ASSIGNMENT_QUESTION_TYPES.map((type) => {
     const existing = byType.get(type)
-    const fallback = DEFAULT_CREATE_QUESTION_ROWS.find((row) => row.type === type)!
+    const fallback = EMPTY_CREATE_QUESTION_ROWS.find((row) => row.type === type)!
     return existing ? { ...existing, type } : { ...fallback }
   })
 }
@@ -71,7 +86,7 @@ export function ensureCreateQuestionRows(rows: QuestionTypeRow[]): QuestionTypeR
 const initialFormData: AssignmentFormData = {
   file: null,
   dueDate: '',
-  questionRows: DEFAULT_CREATE_QUESTION_ROWS,
+  questionRows: EMPTY_CREATE_QUESTION_ROWS,
   additionalInstructions: '',
 }
 
@@ -81,11 +96,21 @@ export const useAssignmentStore = create<AssignmentState>((set) => ({
   isSubmitting: false,
   wsStatus: 'disconnected',
   lastMessage: null,
+  referenceContent: null,
+  referenceExtracting: false,
+  referenceExtractError: null,
 
   setFile: (file) =>
     set((state) => ({
       formData: { ...state.formData, file },
+      referenceContent: null,
+      referenceExtractError: null,
+      referenceExtracting: false,
     })),
+
+  setReferenceContent: (referenceContent) => set({ referenceContent }),
+  setReferenceExtracting: (referenceExtracting) => set({ referenceExtracting }),
+  setReferenceExtractError: (referenceExtractError) => set({ referenceExtractError }),
 
   setDueDate: (dueDate) =>
     set((state) => ({
@@ -94,26 +119,24 @@ export const useAssignmentStore = create<AssignmentState>((set) => ({
 
   addQuestionRow: () =>
     set((state) => {
-      if (state.formData.questionRows.length >= CREATE_ASSIGNMENT_QUESTION_TYPES.length) {
+      const { questionRows } = state.formData
+      if (questionRows.length >= ALL_QUESTION_TYPES.length) {
         return state
       }
-      const used = new Set(state.formData.questionRows.map((r) => r.type))
-      const nextType =
-        CREATE_ASSIGNMENT_QUESTION_TYPES.find((t) => !used.has(t)) ?? 'mcq'
+      const used = new Set(questionRows.map((r) => r.type))
+      const nextType = ALL_QUESTION_TYPES.find((t) => !used.has(t))
+      if (!nextType) return state
       return {
         formData: {
           ...state.formData,
-          questionRows: [
-            ...state.formData.questionRows,
-            createRow(nextType, 1, 1),
-          ],
+          questionRows: [...questionRows, createRow(nextType, 0, 0)],
         },
       }
     }),
 
   removeQuestionRow: (id) =>
     set((state) => {
-      if (state.formData.questionRows.length <= CREATE_ASSIGNMENT_QUESTION_TYPES.length) {
+      if (state.formData.questionRows.length <= MIN_QUESTION_TYPE_ROWS) {
         return state
       }
       return {
@@ -178,11 +201,14 @@ export const useAssignmentStore = create<AssignmentState>((set) => ({
       formData: {
         file: null,
         dueDate: '',
-        questionRows: DEFAULT_CREATE_QUESTION_ROWS.map((row) => ({ ...row })),
+        questionRows: EMPTY_CREATE_QUESTION_ROWS.map((row) => ({ ...row })),
         additionalInstructions: '',
       },
       errors: {},
       isSubmitting: false,
+      referenceContent: null,
+      referenceExtracting: false,
+      referenceExtractError: null,
     }),
 }))
 
@@ -206,6 +232,20 @@ export const ALL_QUESTION_TYPES: QuestionType[] = [
   'fill_in_blank',
 ]
 
+export const MIN_QUESTION_TYPE_ROWS = 1
+
+/** Question types available for a row (current type + types not used elsewhere). */
+export function questionTypesForRow(
+  rows: QuestionTypeRow[],
+  rowId: string,
+): QuestionType[] {
+  const row = rows.find((r) => r.id === rowId)
+  const usedElsewhere = new Set(
+    rows.filter((r) => r.id !== rowId).map((r) => r.type),
+  )
+  return ALL_QUESTION_TYPES.filter((type) => type === row?.type || !usedElsewhere.has(type))
+}
+
 export function computeQuestionTotals(rows: QuestionTypeRow[]) {
   return rows.reduce(
     (acc, row) => ({
@@ -217,5 +257,7 @@ export function computeQuestionTotals(rows: QuestionTypeRow[]) {
 }
 
 export function rowsToQuestionTypes(rows: QuestionTypeRow[]) {
-  return rows.map(({ type, count, marks }) => ({ type, count, marks }))
+  return rows
+    .filter(({ count, marks }) => count > 0 && marks > 0)
+    .map(({ type, count, marks }) => ({ type, count, marks }))
 }

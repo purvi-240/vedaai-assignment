@@ -1,12 +1,11 @@
 'use client'
 
 import {
-  CREATE_ASSIGNMENT_QUESTION_TYPES,
+  MIN_QUESTION_TYPE_ROWS,
   QUESTION_TYPE_LABELS,
+  questionTypesForRow,
   useAssignmentStore,
 } from '@/store/assignmentStore'
-
-const MIN_ROWS = CREATE_ASSIGNMENT_QUESTION_TYPES.length
 import { QuestionTypesFooter } from './QuestionTypesFooter'
 import type { QuestionType } from '@/types/assignment'
 import { CloseIcon } from '@/components/icons/FormIcons'
@@ -49,7 +48,7 @@ export function QuestionTypes() {
                 }
                 aria-label="Question type"
               >
-                {CREATE_ASSIGNMENT_QUESTION_TYPES.map((type) => (
+                {questionTypesForRow(questionRows, row.id).map((type) => (
                   <option key={type} value={type}>
                     {QUESTION_TYPE_LABELS[type]}
                   </option>
@@ -60,7 +59,7 @@ export function QuestionTypes() {
               type="button"
               className="question-row-remove"
               onClick={() => removeQuestionRow(row.id)}
-              disabled={questionRows.length <= MIN_ROWS}
+              disabled={questionRows.length <= MIN_QUESTION_TYPE_ROWS}
               aria-label="Remove question type"
             >
               <CloseIcon />
@@ -71,6 +70,7 @@ export function QuestionTypes() {
                 updateQuestionRowCount(row.id, v)
                 clearError(`questionRows.${index}.count`)
               }}
+              min={0}
               ariaLabel="number of questions"
             />
             <NumberStepper
@@ -79,7 +79,7 @@ export function QuestionTypes() {
                 updateQuestionRowMarks(row.id, v)
                 clearError(`questionRows.${index}.marks`)
               }}
-              min={1}
+              min={0}
               ariaLabel="marks per question"
             />
           </div>
@@ -98,7 +98,7 @@ export function QuestionTypes() {
                 }
                 aria-label="Question type"
               >
-                {CREATE_ASSIGNMENT_QUESTION_TYPES.map((type) => (
+                {questionTypesForRow(questionRows, row.id).map((type) => (
                   <option key={type} value={type}>
                     {QUESTION_TYPE_LABELS[type]}
                   </option>
@@ -108,7 +108,7 @@ export function QuestionTypes() {
                 type="button"
                 className="question-row-remove"
                 onClick={() => removeQuestionRow(row.id)}
-                disabled={questionRows.length <= MIN_ROWS}
+                disabled={questionRows.length <= MIN_QUESTION_TYPE_ROWS}
                 aria-label="Remove question type"
               >
                 <CloseIcon />
@@ -123,6 +123,7 @@ export function QuestionTypes() {
                     updateQuestionRowCount(row.id, v)
                     clearError(`questionRows.${index}.count`)
                   }}
+                  min={0}
                   ariaLabel="number of questions"
                 />
               </div>
@@ -134,7 +135,7 @@ export function QuestionTypes() {
                     updateQuestionRowMarks(row.id, v)
                     clearError(`questionRows.${index}.marks`)
                   }}
-                  min={1}
+                  min={0}
                   ariaLabel="marks per question"
                 />
               </div>

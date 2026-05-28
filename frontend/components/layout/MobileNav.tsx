@@ -16,8 +16,8 @@ import {
 const mobileNavItems = [
   { href: '/', label: 'Home', icon: HomeIcon },
   { href: '/assignments', label: 'Assignments', icon: AssignmentsIcon },
-  { href: '#', label: 'Library', icon: LibraryIcon },
-  { href: '#', label: 'AI Toolkit', icon: ToolkitIcon },
+  { href: '/library', label: 'Library', icon: LibraryIcon },
+  { href: '/assignments/create', label: 'AI Toolkit', icon: ToolkitIcon },
 ]
 
 export function MobileStatusBar() {
@@ -40,7 +40,7 @@ export function MobileHeader() {
     <>
       <MobileStatusBar />
       <header className="mobile-header">
-        <Link href="/assignments" className="mobile-header-logo">
+        <Link href="/" className="mobile-header-logo">
           <VedaLogo size={30} />
           <span>VedaAI</span>
         </Link>
@@ -72,7 +72,10 @@ interface MobilePageBarProps {
 
 export function MobilePageBar({ title = 'Assignment' }: MobilePageBarProps) {
   const pathname = usePathname()
-  const backHref = pathname.includes('/create') ? '/assignments' : '/assignments'
+  const backHref =
+    pathname.includes('/create') || pathname.match(/^\/assignments\/[^/]+$/)
+      ? '/'
+      : '/assignments'
   const showGrid = !pathname.match(/^\/assignments\/?$/)
 
   return (
@@ -98,10 +101,17 @@ export function MobileBottomNav() {
       <nav className="mobile-bottom-nav">
         {mobileNavItems.map((item) => {
           const Icon = item.icon
+          const isOutputDetail =
+            pathname.match(/^\/assignments\/[^/]+$/) &&
+            !pathname.startsWith('/assignments/create')
           const active =
             item.href === '/'
-              ? pathname === '/'
-              : pathname.startsWith(item.href) && item.href !== '#'
+              ? pathname === '/' || Boolean(isOutputDetail)
+              : item.href === '/assignments'
+                ? pathname === '/assignments'
+                : item.href === '/assignments/create'
+                  ? pathname.startsWith('/assignments/create')
+                  : pathname === item.href || pathname.startsWith(`${item.href}/`)
 
           return (
             <Link

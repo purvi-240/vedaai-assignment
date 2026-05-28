@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { Assignment } from '../models/Assignment.js'
 import { enqueueQuestionGeneration } from '../queues/assignmentQueue.js'
+import { parseDueDate } from '../utils/parseDueDate.js'
 import { broadcast } from '../websocket/server.js'
 
 const wsCreateSchema = z.object({
@@ -30,7 +31,7 @@ export async function handleAssignmentCreate(payload: unknown): Promise<void> {
   const body = wsCreateSchema.parse(payload)
 
   const assignment = await Assignment.create({
-    dueDate: new Date(body.dueDate),
+    dueDate: parseDueDate(body.dueDate),
     questionTypes: body.questionTypes,
     additionalInstructions: body.additionalInstructions,
     referenceFileName: body.fileName ?? undefined,

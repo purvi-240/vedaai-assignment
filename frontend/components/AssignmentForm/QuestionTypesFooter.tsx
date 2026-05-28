@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import {
-  CREATE_ASSIGNMENT_QUESTION_TYPES,
+  ALL_QUESTION_TYPES,
   computeQuestionTotals,
   useAssignmentStore,
 } from '@/store/assignmentStore'
@@ -12,7 +12,10 @@ export function QuestionTypesFooter() {
   const addQuestionRow = useAssignmentStore((state) => state.addQuestionRow)
 
   const totals = useMemo(() => computeQuestionTotals(questionRows), [questionRows])
-  const canAddRow = questionRows.length < CREATE_ASSIGNMENT_QUESTION_TYPES.length
+  const usedTypes = new Set(questionRows.map((row) => row.type))
+  const canAddRow =
+    questionRows.length < ALL_QUESTION_TYPES.length &&
+    usedTypes.size < ALL_QUESTION_TYPES.length
 
   return (
     <div className="question-types-footer">

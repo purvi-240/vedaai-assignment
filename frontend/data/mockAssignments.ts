@@ -9,4 +9,3 @@ export const mockAssignments: AssignmentListItem[] = [
   { id: '6', title: 'Quiz on Electricity', assignedOn: '20-06-2025', dueDate: '21-06-2025' },
 ]
 
-export const ASSIGNMENTS_BADGE_COUNT = 10

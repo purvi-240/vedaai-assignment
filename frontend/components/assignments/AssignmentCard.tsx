@@ -115,9 +115,11 @@ export function AssignmentCard({
               type="button"
               className="assignment-card-dropdown-item assignment-card-dropdown-item--danger"
               role="menuitem"
-              onClick={() => {
-                onDelete(assignment.id)
+              onClick={(event) => {
+                event.preventDefault()
+                event.stopPropagation()
                 onMenuClose()
+                void onDelete(assignment.id)
               }}
             >
               Delete
@@ -129,6 +131,11 @@ export function AssignmentCard({
 
   return (
     <article className={`assignment-card ${isMenuOpen ? 'assignment-card--menu-open' : ''}`}>
+      <Link
+        href={`/assignments/${assignment.id}`}
+        className="assignment-card-hit-area"
+        aria-label={`Open ${assignment.title}`}
+      />
       <div className="assignment-card-top">
         <h3 className="assignment-card-title">{assignment.title}</h3>
         <div className="assignment-card-menu-wrap" ref={menuRef}>

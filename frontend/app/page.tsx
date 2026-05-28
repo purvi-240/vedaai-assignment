@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
+import { HomeDashboard } from '@/components/assignments/HomeDashboard'
 
 export default function Home() {
-  redirect('/assignments')
+  return <HomeDashboard />
 }

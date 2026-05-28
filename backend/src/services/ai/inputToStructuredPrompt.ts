@@ -56,7 +56,7 @@ export function inputToStructuredPrompt(input: PromptInput): StructuredPrompt {
     dueDate: input.dueDate,
     additionalInstructions: input.additionalInstructions,
     sections,
-    referenceMaterial: input.referenceContent?.slice(0, 4000),
+    referenceMaterial: input.referenceContent?.slice(0, 12000),
     totalQuestions,
     totalMarks,
   }

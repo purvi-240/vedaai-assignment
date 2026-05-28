@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { VedaLogo } from '@/components/icons/VedaLogo'
@@ -11,63 +12,76 @@ import {
   LibraryIcon,
   SettingsIcon,
   ChevronDownIcon,
+  SparkleSmallIcon,
 } from '@/components/icons/NavIcons'
-import { ASSIGNMENTS_BADGE_COUNT } from '@/data/mockAssignments'
+import { useAssignmentCount } from '@/hooks/useAssignmentCount'
 
 type NavItem = {
   href: string
   label: string
   icon: typeof HomeIcon
   match?: string
-  badge?: number
+  showAssignmentBadge?: boolean
 }
 
 const navItems: NavItem[] = [
   { href: '/', label: 'Home', icon: HomeIcon },
-  { href: '#', label: 'My Groups', icon: GroupsIcon },
+  { href: '/groups', label: 'My Groups', icon: GroupsIcon },
   {
     href: '/assignments',
     label: 'Assignments',
     icon: AssignmentsIcon,
     match: '/assignments',
-    badge: ASSIGNMENTS_BADGE_COUNT,
+    showAssignmentBadge: true,
   },
-  { href: '#', label: "AI Teacher's Toolkit", icon: ToolkitIcon },
-  { href: '#', label: 'My Library', icon: LibraryIcon },
+  {
+    href: '/assignments/create',
+    label: "AI Teacher's Toolkit",
+    icon: ToolkitIcon,
+    match: '/assignments/create',
+  },
+  { href: '/library', label: 'My Library', icon: LibraryIcon },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
+  const assignmentCount = useAssignmentCount()
 
   const isCreatePage = pathname.startsWith('/assignments/create')
+  const isOutputPage = pathname.startsWith('/assignments/') && !pathname.startsWith('/assignments/create') && pathname !== '/assignments'
 
   const isActive = (href: string, match?: string) => {
     const target = match ?? href
-    if (target === '/') return pathname === '/'
-    if (target === '/assignments') {
-      return (
-        pathname === '/assignments' ||
-        (pathname.startsWith('/assignments/') && !pathname.startsWith('/assignments/create'))
-      )
+    if (target === '/settings') {
+      return pathname === '/settings'
     }
-    return pathname.startsWith(target)
+    if (target === '/') {
+      return pathname === '/' || isOutputPage
+    }
+    if (target === '/assignments') {
+      return pathname === '/assignments'
+    }
+    if (target === '/assignments/create') {
+      return isCreatePage
+    }
+    return pathname === target || pathname.startsWith(`${target}/`)
   }
 
   return (
     <>
       <div className="sidebar-top">
-        <Link href="/assignments" className="sidebar-logo">
+        <Link href="/" className="sidebar-logo">
           <VedaLogo size={34} />
           <span className="sidebar-logo-text">VedaAI</span>
         </Link>
 
-        <div className={`btn-create-wrap ${isCreatePage ? 'btn-create-wrap--active' : ''}`}>
+        <div className={`btn-create-wrap ${isCreatePage || isOutputPage ? 'btn-create-wrap--active' : ''}`}>
           <Link
             href="/assignments/create"
-            className={`btn-create-assignment ${isCreatePage ? 'btn-create-assignment--active' : ''}`}
+            className={`btn-create-assignment ${isCreatePage || isOutputPage ? 'btn-create-assignment--active' : ''}`}
           >
-            <span className="btn-plus">+</span>
-            Create Assignment
+            {isOutputPage ? <SparkleSmallIcon /> : <span className="btn-plus">+</span>}
+            {isOutputPage ? "AI Teacher's Toolkit" : 'Create Assignment'}
           </Link>
         </div>
 
@@ -79,12 +93,12 @@ export function Sidebar() {
               <Link
                 key={item.label}
                 href={item.href}
-                className={`sidebar-nav-item ${active ? 'active' : ''} ${item.badge !== undefined && active ? 'active-assignment' : ''}`}
+                className={`sidebar-nav-item ${active ? 'active' : ''} ${item.showAssignmentBadge && active ? 'active-assignment' : ''}`}
               >
                 <Icon />
                 <span className="sidebar-nav-label">{item.label}</span>
-                {item.badge !== undefined && (
-                  <span className="sidebar-nav-badge">{item.badge}</span>
+                {item.showAssignmentBadge && assignmentCount > 0 && (
+                  <span className="sidebar-nav-badge">{assignmentCount}</span>
                 )}
               </Link>
             )
@@ -93,16 +107,19 @@ export function Sidebar() {
       </div>
 
       <div className="sidebar-bottom">
-        <Link href="#" className="sidebar-nav-item settings-item">
+        <Link href="/settings" className="sidebar-nav-item settings-item">
           <SettingsIcon />
           <span>Settings</span>
         </Link>
 
-        <button type="button" className="org-profile">
-          <div className="org-avatar">
-            <img
-              src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=School"
+        <Link href="/settings" className="org-profile">
+          <div className="org-avatar org-avatar--school">
+            <Image
+              src="/dps-school-logo.png"
               alt="Delhi Public School"
+              width={36}
+              height={36}
+              className="org-avatar-image"
             />
           </div>
           <div className="org-info">
@@ -110,7 +127,7 @@ export function Sidebar() {
             <p className="org-location">Bokaro Steel City</p>
           </div>
           <ChevronDownIcon className="org-chevron" />
-        </button>
+        </Link>
       </div>
     </>
   )

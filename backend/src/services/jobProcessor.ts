@@ -1,6 +1,8 @@
 import { Assignment } from '../models/Assignment.js'
 import { QuestionPaper } from '../models/QuestionPaper.js'
 import { generateQuestionPaper } from '../services/ai/llmClient.js'
+import { computeTotalMarksFromSections } from '../services/reference/computePaperTotals.js'
+import { finalizeQuestionSections } from '../services/reference/questionPaperFinalize.js'
 import type { GenerateQuestionsJobData } from '../queues/assignmentQueue.js'
 import { publishBroadcast } from '../websocket/publisher.js'
 
@@ -9,6 +11,10 @@ export async function processQuestionGeneration(
 ): Promise<void> {
   const { assignmentId, dueDate, questionTypes, additionalInstructions, referenceContent } =
     data
+
+  console.log(
+    `[generate] assignment=${assignmentId} referenceChars=${referenceContent?.length ?? 0}`,
+  )
 
   await Assignment.findByIdAndUpdate(assignmentId, { status: 'generating' })
 
@@ -25,11 +31,18 @@ export async function processQuestionGeneration(
       referenceContent,
     })
 
+    finalizeQuestionSections(paper.sections)
+    const totalMarks = computeTotalMarksFromSections(paper.sections)
+
     const savedPaper = await QuestionPaper.create({
       assignmentId,
       title: paper.title,
       sections: paper.sections,
-      totalMarks: paper.totalMarks,
+      totalMarks,
+      schoolName: paper.schoolName,
+      subject: paper.subject,
+      classLabel: paper.classLabel,
+      timeAllowed: paper.timeAllowed,
     })
 
     await Assignment.findByIdAndUpdate(assignmentId, {

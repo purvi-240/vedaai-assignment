@@ -6,6 +6,10 @@ export interface IQuestionPaper extends Document {
   title: string
   sections: QuestionSection[]
   totalMarks: number
+  schoolName?: string
+  subject?: string
+  classLabel?: string
+  timeAllowed?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -42,6 +46,10 @@ const questionPaperSchema = new Schema<IQuestionPaper>(
     title: { type: String, required: true },
     sections: { type: [questionSectionSchema], required: true },
     totalMarks: { type: Number, required: true },
+    schoolName: { type: String },
+    subject: { type: String },
+    classLabel: { type: String },
+    timeAllowed: { type: String },
   },
   { timestamps: true },
 )

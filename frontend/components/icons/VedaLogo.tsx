@@ -1,34 +1,28 @@
-import type { SVGProps } from 'react'
+import type { ImgHTMLAttributes, SVGProps } from 'react'
 
-interface VedaLogoProps extends SVGProps<SVGSVGElement> {
+/** Matches viewBox of `public/logo 2.svg` (80×71). */
+const LOGO_ASPECT = 71 / 80
+
+const LOGO_SRC = '/logo-2.svg'
+
+interface VedaLogoProps
+  extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt' | 'width' | 'height'> {
   size?: number
 }
 
-export function VedaLogo({ size = 32, ...props }: VedaLogoProps) {
+export function VedaLogo({ size = 32, className, style, ...props }: VedaLogoProps) {
+  const height = Math.round(size * LOGO_ASPECT)
+
   return (
-    <svg
+    <img
+      src={LOGO_SRC}
+      alt="VedaAI"
       width={size}
-      height={size}
-      viewBox="0 0 32 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      height={height}
+      className={className}
+      style={{ display: 'block', flexShrink: 0, ...style }}
       {...props}
-    >
-      <defs>
-        <linearGradient id="vedaLogoGrad" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#FF7950" />
-          <stop offset="1" stopColor="#C0350A" />
-        </linearGradient>
-      </defs>
-      <rect width="32" height="32" rx="9" fill="url(#vedaLogoGrad)" />
-      <path
-        d="M10 23V9L16 17.5L22 9V23"
-        stroke="white"
-        strokeWidth="2.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    />
   )
 }
 

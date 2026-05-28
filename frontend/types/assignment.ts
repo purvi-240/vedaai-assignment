@@ -46,4 +46,5 @@ export interface AssignmentListItem {
   title: string
   assignedOn: string
   dueDate: string
+  status?: 'pending' | 'generating' | 'completed' | 'failed'
 }

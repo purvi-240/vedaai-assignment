@@ -6,6 +6,7 @@ export interface IAssignment extends Document {
   questionTypes: QuestionTypeConfig[]
   additionalInstructions: string
   referenceFileName?: string
+  referenceExcerpt?: string
   status: AssignmentStatus
   questionPaper?: mongoose.Types.ObjectId
   createdAt: Date
@@ -39,6 +40,7 @@ const assignmentSchema = new Schema<IAssignment>(
     questionTypes: { type: [questionTypeConfigSchema], required: true },
     additionalInstructions: { type: String, default: '' },
     referenceFileName: { type: String },
+    referenceExcerpt: { type: String, maxlength: 12000 },
     status: {
       type: String,
       enum: ['pending', 'generating', 'completed', 'failed'],
